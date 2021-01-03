@@ -17,7 +17,7 @@ include(dependency_injection/dependency_injection.pri)
 ```
 - 管理对象
 ```cpp
-IInstantiationService *iis = new InstantiationService(nullptr);
+IInstantiationService *iis = new InstantiationService(nullptr);//一般在一个应用内只构造一个根容器对象
 iis->registerSingleton<IFoo>(new Foo());
 ```
 

@@ -29,13 +29,13 @@ class Bar : public IBar{
 public:
     explicit Bar(int a,int b,QObject *parent = nullptr) : IBar(parent){
     
-	}
+    }
     double someMethod() override{
-		if(foo){
-			foo->someMethod();
-		}
-	}
-	//定义可以被自动注入的字段，第一个参数为字段类型，第一个参数为字段的变量名称
+        if(foo){
+            foo->someMethod();
+        }
+    }
+    //定义可以被自动注入的字段，第一个参数为字段类型，第一个参数为字段的变量名称
     IOC_INJECTABLE(IFoo,foo)
 private:
     IFoo *foo{nullptr};

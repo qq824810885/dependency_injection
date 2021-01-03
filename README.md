@@ -42,7 +42,7 @@ private:
 };
 ```
 - 自动装配对象
-```
+```cpp
 IBar *c = iis->newObject<Bar>(1,2);//通过容器创建的对象会将对象中定义的可自动注入的字段注入相应类型的对象。
 c->someMethod();
 ```

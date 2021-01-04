@@ -1,7 +1,10 @@
 #ifndef IINSTANTIATIONSERVICE_H
 #define IINSTANTIATIONSERVICE_H
 
-#define IOC_INJECTABLE(CLASSNAME,fieldName) \
+#define IOC_INJECTABLE(CLASSNAME,fieldName,CLASSID...) \
+    Q_INVOKABLE QString __getInspect_ClassId_##CLASSNAME(){ \
+            return QString(CLASSID).isEmpty() ? QString(#CLASSNAME) : QString(CLASSID);\
+    } \
     Q_INVOKABLE bool __inspect##CLASSNAME(QObject *fieldName){\
         if(QString(#CLASSNAME) != fieldName->metaObject()->className()){\
             return false;\
@@ -29,8 +32,8 @@ public:
     virtual ~IInstantiationService(){}
 
     template<typename T>
-    bool registerSingleton(T *instance){
-        QString className = instance->metaObject()->className();
+    bool registerSingleton(T *instance,const QString &ns = QString()){
+        QString className = ns.isEmpty() ? instance->metaObject()->className() : ns;
         bool alreadyExists = hasObject(className);
         if(alreadyExists){
             qWarning() << "The singleton with class : " << className << " already exists in DI container!";
@@ -42,8 +45,8 @@ public:
     }
 
     template<typename T>
-    T* getSingleton(){
-        QString className = T::metaObject().className();
+    T* getSingleton(const QString &ns = QString()){
+        QString className = ns.isEmpty() ? T::metaObject().className() : ns;
         QObject *obj = queryObject(className);
         if(obj == nullptr){
             return nullptr;
@@ -67,6 +70,8 @@ public:
                 continue;
             }
             QString autoInjectType = methodName.mid(injectMethodPrefix.length());
+            QByteArray getClsIdMethodName = "__getInspect_ClassId_" + autoInjectType.toUtf8();
+            QMetaObject::invokeMethod(obj,getClsIdMethodName.data(),Qt::DirectConnection,Q_RETURN_ARG(QString,autoInjectType));
             QObject *instance = queryObject(autoInjectType);
             bool injectResult = false;
             if(instance){
